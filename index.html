@@ -29,7 +29,7 @@
             height: 100vh;
             position: relative;
             padding-top: 45px;
-            /* Subtle matrix dot pattern for injection-molded textured backing */
+            /* Molded textured background backing pattern */
             background-image: radial-gradient(rgba(0, 178, 148, 0.15) 2px, transparent 0);
             background-size: 24px 24px;
         }
@@ -101,7 +101,6 @@
             transform: translateY(0.5px);
         }
 
-        /* GitHub Button Special Gloss Overlap */
         .topbar-link-btn-github {
             border-color: #475569;
             font-weight: 800;
@@ -276,7 +275,7 @@
             <i class="fa-solid fa-cubes"></i> DefenestrationOS
         </div>
         <div class="topbar-menu">
-            <a href="https://github.com/n1nerlang/Defenestration" target="_blank" class="topbar-link-btn topbar-link-btn-github">
+            <a href="https://github.com/n1nerlang/Defenestration" id="topbar-github-link" target="_blank" class="topbar-link-btn topbar-link-btn-github">
                 <i class="fa-brands fa-github"></i> Source Code
             </a>
             <button class="topbar-btn"><i class="fa-solid fa-terminal"></i> Terminal</button>
@@ -329,11 +328,19 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // TARGET CONFIGURATION CONSTANTS
+            const REPO_OWNER = "n1nerlang";
+            const REPO_NAME = "Defenestration";
+
             const platformBadge = document.getElementById("detected-platform");
             const coreBadge = document.getElementById("detected-cores");
             const ramBadge = document.getElementById("detected-ram");
             const fetchBtn = document.getElementById("fetch-btn");
             const outputArea = document.getElementById("release-output");
+            const topbarLink = document.getElementById("topbar-github-link");
+
+            // Double check links setup values match the global constant states
+            topbarLink.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}`;
 
             let userOS = "Unknown";
             let osIcon = "fa-question";
@@ -368,13 +375,13 @@
             // 3. Handle GitHub API compilation fetching
             fetchBtn.addEventListener("click", async () => {
                 outputArea.style.display = "block";
-                outputArea.innerHTML = "Connecting to repository API endpoints...";
+                outputArea.innerHTML = `Connecting to api.github.com/repos/${REPO_OWNER}/${REPO_NAME}...`;
                 
                 try {
-                    const response = await fetch("https://api.github.com/repos/n1nerlang/Defenestration/releases/latest");
+                    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`);
                     
                     if (!response.ok) {
-                        throw new Error(`Repository error: Status Code ${response.status}`);
+                        throw new Error(`Endpoint response issue: Status ${response.status}. Verify repo path ownership configurations.`);
                     }
                     
                     const data = await response.json();
@@ -420,7 +427,7 @@
                     } else {
                         outputArea.innerHTML = `
                             <strong>Latest Build found:</strong> ${data.tag_name}<br>
-                            <span style="color: #ff7675;">No explicit x86_64 binaries detected in asset payload.</span><br>
+                            <span style="color: #ff7675;">No explicit binaries detected in asset payload matching architecture.</span><br>
                             <a href="${data.html_url}" target="_blank" style="color: #00d2ff; text-decoration: underline;">
                                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Release Tree Manually
                             </a>
@@ -428,10 +435,10 @@
                     }
 
                 } catch (error) {
-                    outputArea.innerHTML = `<span style="color: #ff7675;"><i class="fa-solid fa-triangle-exclamation"></i> Failed to resolve elements: ${error.message}</span>`;
+                    outputArea.innerHTML = `<span style="color: #ff7675;"><i class="fa-solid fa-triangle-exclamation"></i> Error querying repository target payload: <br>${error.message}</span>`;
                 }
             });
         });
     </script>
 </body>
-</html>
+    </html>
